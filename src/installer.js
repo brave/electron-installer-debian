@@ -110,6 +110,14 @@ var getSize = function (options, callback) {
   fsize(options.src, callback)
 }
 
+var checkXfce = function (options, callback) {
+  options.logger('checking window manager')
+
+  spawn(options, 'sh', ['-c', '[ $(echo $XDG_CURRENT_DESKTOP | awk \'{print tolower($0)}\') == "xfce" ] && echo true  || echo false'], function (err) {
+    callback(err)
+  })
+}
+
 /**
  * Get the hash of default options for the installer. Some come from the info
  * read from `package.json`, and some are hardcoded.
@@ -128,7 +136,7 @@ var getDefaults = function (data, callback) {
       genericName: pkg.genericName || pkg.productName || pkg.name,
       description: pkg.description,
       productDescription: pkg.productDescription || pkg.description,
-      isXFCE: false,
+      isXFCE: checkXfce(),
       userDataDir: pkg.userDataDir || pkg.name,
       // Use '~' on pre-releases for proper Debian version ordering.
       // See https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
